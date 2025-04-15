@@ -90,19 +90,18 @@ resource "aws_db_instance" "education" {
   engine                 = "postgres"
   engine_version         = "16"
   username               = var.db_username
-  password_wo            = ephemeral.random_password.db_password.result
-  password_wo_version    = local.db_password_version
+  password               = ephemeral.random_password.db_password.result
   db_subnet_group_name   = aws_db_subnet_group.education.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   parameter_group_name   = aws_db_parameter_group.education.name
   publicly_accessible    = true
   skip_final_snapshot    = true
+  storage_encrypted      = var.db_encrypted
 }
 
 resource "aws_ssm_parameter" "secret" {
   name             = "/education/database/${var.db_name}/password/master"
   description      = "Password for RDS database."
   type             = "SecureString"
-  value_wo         = ephemeral.random_password.db_password.result
-  value_wo_version = local.db_password_version
+  value            = ephemeral.random_password.db_password.result
 }
